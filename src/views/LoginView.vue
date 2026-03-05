@@ -47,7 +47,12 @@ export default {
         authStore.loadUserFromToken(token);
         this.$router.push({ name: "Dashboard" });
       } catch (err) {
-        this.error = err?.response?.data?.message || err?.message || "Error al iniciar sesión";
+        const isTimeout = err.code === "ECONNABORTED" || err?.message?.includes("timeout");
+        if (isTimeout) {
+          this.error = "El servidor tardó en responder. Intentá de nuevo en unos segundos.";
+        } else {
+          this.error = err?.response?.data?.message || "Error al iniciar sesión";
+        }
       } finally {
         this.loading = false;
       }
